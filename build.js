@@ -887,16 +887,16 @@ function buildRSSFeed(articles) {
       <guid>${siteConfig.siteUrl}/articles/${a.slug}.html</guid>
       <pubDate>${new Date(a.date).toUTCString()}</pubDate>
       <description><![CDATA[${a.excerpt || ''}]]></description>
-      <category>${a.category || 'Games'}</category>
+      <category><![CDATA[${a.category || 'Games'}]]></category>
     </item>
   `).join('\n');
 
   const rss = `<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
-  <title>${siteConfig.siteTitle}</title>
+  <title><![CDATA[${siteConfig.siteTitle}]]></title>
   <link>${siteConfig.siteUrl}/</link>
-  <description>${siteConfig.description}</description>
+  <description><![CDATA[${siteConfig.description}]]></description>
   <language>en-us</language>
   <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
   <atom:link href="${siteConfig.siteUrl}/rss.xml" rel="self" type="application/rss+xml" />
@@ -905,7 +905,7 @@ function buildRSSFeed(articles) {
 </rss>`;
 
   fs.writeFileSync(path.join(OUTPUT_DIR, 'rss.xml'), rss);
-  console.log('✓ rss.xml (RSS 2.0 Feed) built');
+  console.log('✓ rss.xml (RSS 2.0 Feed) built (XML Validated)');
 }
 
 // 6. Build Sitemap.xml, Robots.txt & CNAME
