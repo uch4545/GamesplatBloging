@@ -6,6 +6,10 @@
   "siteUrl": "https://gamesplat.com",
   "author": "GamesPlat Editorial Team",
   "contactEmail": "hello@gamesplat.com",
+  "defaultOgImage": "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&auto=format&fit=crop&q=80",
+  "googleSiteVerification": "",
+  "pinterestVerification": "",
+  "googleAnalyticsId": "",
   "categories": [
     {
       "name": "Party Games",

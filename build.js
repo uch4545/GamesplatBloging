@@ -1,7 +1,8 @@
 /**
  * GamesPlat.com — Static Site Generator (build.js)
- * Automatically builds all pages, category archives, article pages,
- * legal compliance pages, sitemap.xml, and RSS from Markdown.
+ * Enhanced with Elite SEO, Structured Data (JSON-LD),
+ * Sitelinks Searchbox, Breadcrumbs, OpenGraph, Twitter Cards,
+ * RSS 2.0 Feed, and Google Search Console integration.
  */
 
 const fs = require('fs');
@@ -20,16 +21,14 @@ const configPath = path.join(__dirname, 'site.config.json');
 const siteConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 
 const CONTENT_DIR = path.join(__dirname, 'content', 'articles');
-const OUTPUT_DIR = __dirname; // Generates in root for direct GitHub Pages compatibility
+const OUTPUT_DIR = __dirname;
 const ARTICLES_OUT_DIR = path.join(OUTPUT_DIR, 'articles');
 const CATEGORIES_OUT_DIR = path.join(OUTPUT_DIR, 'categories');
 
-// Ensure output directories exist
 [ARTICLES_OUT_DIR, CATEGORIES_OUT_DIR].forEach(dir => {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 });
 
-// Helper: Category styling helper
 function getCategoryMeta(categoryName) {
   const match = siteConfig.categories.find(c => c.name.toLowerCase() === (categoryName || '').toLowerCase());
   return match || {
@@ -41,7 +40,6 @@ function getCategoryMeta(categoryName) {
   };
 }
 
-// Helper: Format Date
 function formatDate(dateStr) {
   try {
     const d = new Date(dateStr);
@@ -51,7 +49,79 @@ function formatDate(dateStr) {
   }
 }
 
-// 1. Read all articles
+// Global SEO Head Tags Helper
+function renderSEOHead({
+  title,
+  description,
+  canonicalUrl,
+  ogType = 'website',
+  ogImage,
+  publishDate,
+  category,
+  structuredData = []
+}) {
+  const finalImage = ogImage || siteConfig.defaultOgImage;
+  const googleVerification = siteConfig.googleSiteVerification ? `<meta name="google-site-verification" content="${siteConfig.googleSiteVerification}">` : '';
+  const pinterestVerification = siteConfig.pinterestVerification ? `<meta name="p-domain-verify" content="${siteConfig.pinterestVerification}">` : '';
+  const gaSnippet = siteConfig.googleAnalyticsId ? `
+    <!-- Google Analytics (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=${siteConfig.googleAnalyticsId}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '${siteConfig.googleAnalyticsId}');
+    </script>
+  ` : '';
+
+  const jsonLdScripts = structuredData.map(data => `
+    <script type="application/ld+json">
+      ${JSON.stringify(data, null, 2)}
+    </script>
+  `).join('\n');
+
+  return `
+  <!-- Primary SEO Meta Tags -->
+  <title>${title}</title>
+  <meta name="title" content="${title}">
+  <meta name="description" content="${description}">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <link rel="canonical" href="${canonicalUrl}">
+  ${googleVerification}
+  ${pinterestVerification}
+
+  <!-- Open Graph / Facebook / Pinterest -->
+  <meta property="og:type" content="${ogType}">
+  <meta property="og:site_name" content="${siteConfig.siteTitle}">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:url" content="${canonicalUrl}">
+  <meta property="og:title" content="${title}">
+  <meta property="og:description" content="${description}">
+  <meta property="og:image" content="${finalImage}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="${title}">
+  ${publishDate ? `<meta property="article:published_time" content="${publishDate}">` : ''}
+  ${category ? `<meta property="article:section" content="${category}">` : ''}
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${title}">
+  <meta name="twitter:description" content="${description}">
+  <meta name="twitter:image" content="${finalImage}">
+
+  <!-- RSS Feed Link -->
+  <link rel="alternate" type="application/rss+xml" title="${siteConfig.siteTitle} RSS Feed" href="${siteConfig.siteUrl}/rss.xml">
+
+  <!-- Preconnect for Google Fonts Speed -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  ${gaSnippet}
+  ${jsonLdScripts}
+  `;
+}
+
 function loadAllArticles() {
   if (!fs.existsSync(CONTENT_DIR)) {
     fs.mkdirSync(CONTENT_DIR, { recursive: true });
@@ -69,7 +139,6 @@ function loadAllArticles() {
     const slug = data.slug || file.replace(/\.md$/, '');
     const htmlContent = marked.parse(content);
 
-    // Calculate reading time
     const wordCount = content.split(/\s+/).length;
     const readingTime = Math.max(1, Math.round(wordCount / 200));
 
@@ -83,11 +152,9 @@ function loadAllArticles() {
     });
   }
 
-  // Sort articles by date descending
   return articles.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
 }
 
-// Components: Header & Footer
 function renderHeader(activePage = '', basePath = '') {
   const navItems = siteConfig.categories.map(cat => {
     const isActive = activePage === cat.slug ? 'active' : '';
@@ -134,6 +201,8 @@ function renderFooter(basePath = '') {
           <p class="footer-tagline">${siteConfig.tagline}. Making game nights, holidays, and classroom brain breaks unforgettable.</p>
           <div style="display:flex; gap:0.75rem; margin-top:1rem;">
             <a href="${siteConfig.socials.pinterest}" target="_blank" rel="noopener" style="color:#f43f5e; font-weight:700; font-size:0.85rem;">📌 Follow on Pinterest</a>
+            <span style="color:#475569;">•</span>
+            <a href="${basePath}rss.xml" target="_blank" style="color:#f59e0b; font-weight:700; font-size:0.85rem;">📡 RSS Feed</a>
           </div>
         </div>
 
@@ -175,15 +244,14 @@ function renderFooter(basePath = '') {
   <script src="${basePath}assets/js/main.js"></script>`;
 }
 
-// Helper: Post Card HTML
 function renderPostCard(article, basePath = '') {
   const cat = getCategoryMeta(article.category);
-  const imgUrl = article.image || 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&auto=format&fit=crop&q=80';
+  const imgUrl = article.image || siteConfig.defaultOgImage;
 
   return `
   <article class="post-card">
     <a href="${basePath}articles/${article.slug}.html" class="post-card-img-wrap" aria-label="${article.title}">
-      <img src="${imgUrl}" alt="${article.title}" loading="lazy">
+      <img src="${imgUrl}" alt="${article.title}" loading="lazy" decoding="async">
     </a>
     <div class="post-card-body">
       <span class="badge ${cat.color}">${cat.icon} ${cat.name}</span>
@@ -207,7 +275,7 @@ function renderPostCard(article, basePath = '') {
   </article>`;
 }
 
-// 2. Build Homepage (index.html)
+// 1. Build Homepage with WebSite + SearchAction Schema
 function buildHomepage(articles) {
   const featured = articles.find(a => a.featured) || articles[0];
   const latestArticles = articles;
@@ -222,7 +290,7 @@ function buildHomepage(articles) {
     <section class="featured-section">
       <div class="featured-card">
         <div class="featured-img-wrap">
-          <img src="${featured.image || 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1000'}" alt="${featured.title}">
+          <img src="${featured.image || siteConfig.defaultOgImage}" alt="${featured.title}" decoding="async">
         </div>
         <div class="featured-content">
           <div>
@@ -251,36 +319,50 @@ function buildHomepage(articles) {
 
   const postsGridHtml = latestArticles.map(a => renderPostCard(a, '')).join('');
 
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": siteConfig.siteTitle,
+      "alternateName": "GamesPlat Blog",
+      "url": `${siteConfig.siteUrl}/`,
+      "description": siteConfig.description,
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": `${siteConfig.siteUrl}/?s={search_term_string}`,
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": siteConfig.siteTitle,
+      "url": `${siteConfig.siteUrl}/`,
+      "logo": `${siteConfig.siteUrl}/assets/images/logo.png`,
+      "sameAs": [
+        siteConfig.socials.pinterest,
+        siteConfig.socials.facebook,
+        siteConfig.socials.instagram
+      ]
+    }
+  ];
+
+  const seoHead = renderSEOHead({
+    title: `${siteConfig.siteTitle} — ${siteConfig.tagline}`,
+    description: siteConfig.description,
+    canonicalUrl: `${siteConfig.siteUrl}/`,
+    ogType: 'website',
+    ogImage: featured ? featured.image : siteConfig.defaultOgImage,
+    structuredData
+  });
+
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${siteConfig.siteTitle} — ${siteConfig.tagline}</title>
-  <meta name="description" content="${siteConfig.description}">
-  <link rel="canonical" href="${siteConfig.siteUrl}/">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  ${seoHead}
   <link rel="stylesheet" href="assets/css/style.css">
-  
-  <!-- OpenGraph / Pinterest Rich Pins -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="${siteConfig.siteUrl}/">
-  <meta property="og:title" content="${siteConfig.siteTitle} — Fun Party, Family & Classroom Games">
-  <meta property="og:description" content="${siteConfig.description}">
-  <meta property="og:image" content="${featured ? featured.image : ''}">
-
-  <!-- Schema.org Website -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "${siteConfig.siteTitle}",
-    "url": "${siteConfig.siteUrl}/",
-    "description": "${siteConfig.description}"
-  }
-  </script>
 </head>
 <body>
   ${renderHeader('home', '')}
@@ -288,7 +370,7 @@ function buildHomepage(articles) {
   <main>
     <section class="hero">
       <div class="container">
-        <div class="hero-pill">🎈 Ready to play? Hundreds of game rules & ideas</div>
+        <div class="hero-pill">🎈 Ready to play? Hundreds of party & board game rules</div>
         <h1 class="hero-title">Fun Games for <span class="gradient-text">Parties, Family Nights & Classrooms</span></h1>
         <p class="hero-subtitle">Fast, step-by-step game rules, party icebreakers, and free printables to make every gathering unforgettable.</p>
         
@@ -320,7 +402,6 @@ function buildHomepage(articles) {
         <p>Try searching for words like "Christmas", "Spoons", "Cards", or "Classroom".</p>
       </div>
 
-      <!-- Pinterest & Printables Callout Banner -->
       <section class="printable-card" style="margin-bottom:4rem;">
         <span class="printable-badge">📌 Free Printable Library</span>
         <h3 class="printable-title">Looking for Free Party Bingo & Scavenger Hunt Sheets?</h3>
@@ -337,10 +418,10 @@ function buildHomepage(articles) {
 </html>`;
 
   fs.writeFileSync(path.join(OUTPUT_DIR, 'index.html'), html);
-  console.log('✓ index.html built');
+  console.log('✓ index.html built (SEO Enhanced)');
 }
 
-// 3. Build Category Pages
+// 2. Build Category Pages with CollectionPage & BreadcrumbList Schema
 function buildCategoryPages(articles) {
   siteConfig.categories.forEach(cat => {
     const filteredArticles = articles.filter(a => (a.category || '').toLowerCase() === cat.name.toLowerCase());
@@ -351,17 +432,51 @@ function buildCategoryPages(articles) {
            <p>We are adding daily games to the ${cat.name} section.</p>
          </div>`;
 
+    const catUrl = `${siteConfig.siteUrl}/categories/${cat.slug}.html`;
+
+    const structuredData = [
+      {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": `${cat.name} — GamesPlat`,
+        "url": catUrl,
+        "description": cat.description
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": `${siteConfig.siteUrl}/`
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": cat.name,
+            "item": catUrl
+          }
+        ]
+      }
+    ];
+
+    const seoHead = renderSEOHead({
+      title: `${cat.name} — Fun Ideas & Rules | GamesPlat`,
+      description: cat.description,
+      canonicalUrl: catUrl,
+      ogType: 'website',
+      ogImage: filteredArticles[0]?.image || siteConfig.defaultOgImage,
+      structuredData
+    });
+
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${cat.name} — GamesPlat.com</title>
-  <meta name="description" content="${cat.description}">
-  <link rel="canonical" href="${siteConfig.siteUrl}/categories/${cat.slug}.html">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  ${seoHead}
   <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
@@ -388,14 +503,17 @@ function buildCategoryPages(articles) {
 </html>`;
 
     fs.writeFileSync(path.join(CATEGORIES_OUT_DIR, `${cat.slug}.html`), html);
-    console.log(`✓ categories/${cat.slug}.html built`);
+    console.log(`✓ categories/${cat.slug}.html built (SEO Enhanced)`);
   });
 }
 
-// 4. Build Article Pages
+// 3. Build Article Pages with BlogPosting + Breadcrumbs + FAQ Schema
 function buildArticlePages(articles) {
   articles.forEach(article => {
     const cat = getCategoryMeta(article.category);
+    const articleUrl = `${siteConfig.siteUrl}/articles/${article.slug}.html`;
+    const catUrl = `${siteConfig.siteUrl}/categories/${cat.slug}.html`;
+
     const related = articles
       .filter(a => a.slug !== article.slug && (a.category || '').toLowerCase() === (article.category || '').toLowerCase())
       .slice(0, 3);
@@ -420,27 +538,75 @@ function buildArticlePages(articles) {
       </div>
     ` : '';
 
-    // FAQ schema if article.faqs array exists
-    let faqSchema = '';
-    let faqAccordionHtml = '';
-    if (article.faqs && Array.isArray(article.faqs) && article.faqs.length > 0) {
-      faqSchema = `
-      <script type="application/ld+json">
+    // Structured Data: BreadcrumbList + Article/BlogPosting
+    const structuredData = [
       {
         "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-          ${article.faqs.map(f => `{
-            "@type": "Question",
-            "name": ${JSON.stringify(f.q)},
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": ${JSON.stringify(f.a)}
-            }
-          }`).join(',')}
+        "@type": "BlogPosting",
+        "headline": article.title,
+        "description": article.excerpt || '',
+        "image": [article.image || siteConfig.defaultOgImage],
+        "datePublished": article.date,
+        "dateModified": article.date,
+        "author": {
+          "@type": "Person",
+          "name": article.author || siteConfig.author
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": siteConfig.siteTitle,
+          "url": siteConfig.siteUrl,
+          "logo": {
+            "@type": "ImageObject",
+            "url": `${siteConfig.siteUrl}/assets/images/logo.png`
+          }
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": articleUrl
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": `${siteConfig.siteUrl}/`
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": cat.name,
+            "item": catUrl
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": article.title,
+            "item": articleUrl
+          }
         ]
       }
-      </script>`;
+    ];
+
+    // FAQ Section & Schema
+    let faqAccordionHtml = '';
+    if (article.faqs && Array.isArray(article.faqs) && article.faqs.length > 0) {
+      structuredData.push({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": article.faqs.map(f => ({
+          "@type": "Question",
+          "name": f.q,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": f.a
+          }
+        }))
+      });
 
       faqAccordionHtml = `
       <section class="faq-section">
@@ -459,53 +625,27 @@ function buildArticlePages(articles) {
       </section>`;
     }
 
-    const shareUrl = `${siteConfig.siteUrl}/articles/${article.slug}.html`;
     const shareTitle = encodeURIComponent(article.title);
-    const pinImg = encodeURIComponent(article.pinterestImage || article.image || '');
+    const pinImg = encodeURIComponent(article.pinterestImage || article.image || siteConfig.defaultOgImage);
+
+    const seoHead = renderSEOHead({
+      title: `${article.title} — GamesPlat`,
+      description: article.excerpt || '',
+      canonicalUrl: articleUrl,
+      ogType: 'article',
+      ogImage: article.image || siteConfig.defaultOgImage,
+      publishDate: article.date,
+      category: cat.name,
+      structuredData
+    });
 
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${article.title} — GamesPlat</title>
-  <meta name="description" content="${article.excerpt || ''}">
-  <link rel="canonical" href="${shareUrl}">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  ${seoHead}
   <link rel="stylesheet" href="../assets/css/style.css">
-
-  <!-- OpenGraph / Pinterest Rich Pin Meta Tags -->
-  <meta property="og:type" content="article">
-  <meta property="og:url" content="${shareUrl}">
-  <meta property="og:title" content="${article.title}">
-  <meta property="og:description" content="${article.excerpt || ''}">
-  <meta property="og:image" content="${article.image || ''}">
-  <meta property="article:published_time" content="${article.date}">
-  <meta property="article:section" content="${cat.name}">
-
-  <!-- Schema.org Article Structured Data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": ${JSON.stringify(article.title)},
-    "description": ${JSON.stringify(article.excerpt || '')},
-    "image": [${JSON.stringify(article.image || '')}],
-    "datePublished": "${article.date}",
-    "author": {
-      "@type": "Person",
-      "name": "${article.author || siteConfig.author}"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "${siteConfig.siteTitle}",
-      "url": "${siteConfig.siteUrl}"
-    }
-  }
-  </script>
-  ${faqSchema}
 </head>
 <body>
   ${renderHeader(cat.slug, '../')}
@@ -534,15 +674,14 @@ function buildArticlePages(articles) {
 
         <div class="social-share-bar" style="justify-content:center;">
           <span class="share-label">Share:</span>
-          <a href="https://pinterest.com/pin/create/button/?url=${encodeURIComponent(shareUrl)}&media=${pinImg}&description=${shareTitle}" target="_blank" rel="noopener" class="share-btn share-pinterest">📌 Save Pin</a>
-          <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}" target="_blank" rel="noopener" class="share-btn share-facebook">Facebook</a>
+          <a href="https://pinterest.com/pin/create/button/?url=${encodeURIComponent(articleUrl)}&media=${pinImg}&description=${shareTitle}" target="_blank" rel="noopener" class="share-btn share-pinterest">📌 Save Pin</a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}" target="_blank" rel="noopener" class="share-btn share-facebook">Facebook</a>
           <button class="share-btn share-copy">📋 Copy Link</button>
         </div>
       </header>
 
-      ${article.image ? `<img src="${article.image}" alt="${article.title}" class="article-featured-img">` : ''}
+      ${article.image ? `<img src="${article.image}" alt="${article.title}" class="article-featured-img" decoding="async">` : ''}
 
-      <!-- Game Specs Summary Box -->
       <section class="game-specs-box">
         <div class="game-spec-item">
           <div class="game-spec-icon">👥</div>
@@ -577,29 +716,24 @@ function buildArticlePages(articles) {
         </div>
       </section>
 
-      <!-- Main Article Body -->
       <div class="article-body">
         ${article.contentHtml}
       </div>
 
-      <!-- Printable Download Box -->
       ${printableHtml}
 
-      <!-- Pinterest Save Callout Box -->
       <div class="pinterest-pin-box">
         <div>
           <h4 style="font-weight:800; font-size:1.1rem; color:#991b1b; margin-bottom:0.25rem;">📌 Pin This Game For Later!</h4>
           <p style="font-size:0.88rem; color:#b91c1c;">Planning a party or game night? Save this idea to your Pinterest board so you don't lose it.</p>
         </div>
-        <a href="https://pinterest.com/pin/create/button/?url=${encodeURIComponent(shareUrl)}&media=${pinImg}&description=${shareTitle}" target="_blank" rel="noopener" class="share-btn share-pinterest" style="white-space:nowrap; padding:0.6rem 1.2rem;">
+        <a href="https://pinterest.com/pin/create/button/?url=${encodeURIComponent(articleUrl)}&media=${pinImg}&description=${shareTitle}" target="_blank" rel="noopener" class="share-btn share-pinterest" style="white-space:nowrap; padding:0.6rem 1.2rem;">
           Save to Pinterest
         </a>
       </div>
 
-      <!-- FAQ Section -->
       ${faqAccordionHtml}
 
-      <!-- Author Box (E-E-A-T Google Requirement) -->
       <div style="background:var(--bg-alt); border-radius:var(--radius-md); padding:1.5rem; margin-top:2.5rem; display:flex; align-items:center; gap:1.25rem;">
         <div style="font-size:2.5rem; background:white; width:64px; height:64px; border-radius:var(--radius-full); display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-sm);">🎮</div>
         <div>
@@ -608,7 +742,6 @@ function buildArticlePages(articles) {
         </div>
       </div>
 
-      <!-- Related Posts -->
       ${relatedHtml}
     </article>
   </main>
@@ -618,11 +751,11 @@ function buildArticlePages(articles) {
 </html>`;
 
     fs.writeFileSync(path.join(ARTICLES_OUT_DIR, `${article.slug}.html`), html);
-    console.log(`✓ articles/${article.slug}.html built`);
+    console.log(`✓ articles/${article.slug}.html built (SEO Enhanced)`);
   });
 }
 
-// 5. Build Legal & AdSense Compliance Pages
+// 4. Build Legal & AdSense Compliance Pages
 function buildLegalPages() {
   const pages = [
     {
@@ -696,16 +829,20 @@ function buildLegalPages() {
   ];
 
   pages.forEach(p => {
+    const pageUrl = `${siteConfig.siteUrl}/${p.slug}.html`;
+    const seoHead = renderSEOHead({
+      title: `${p.title} — GamesPlat.com`,
+      description: `${p.title} for GamesPlat.com.`,
+      canonicalUrl: pageUrl,
+      ogType: 'website'
+    });
+
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${p.title} — GamesPlat.com</title>
-  <link rel="canonical" href="${siteConfig.siteUrl}/${p.slug}.html">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  ${seoHead}
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -727,16 +864,47 @@ function buildLegalPages() {
   });
 }
 
+// 5. Build RSS 2.0 Feed (rss.xml)
+function buildRSSFeed(articles) {
+  const feedItems = articles.map(a => `
+    <item>
+      <title><![CDATA[${a.title}]]></title>
+      <link>${siteConfig.siteUrl}/articles/${a.slug}.html</link>
+      <guid>${siteConfig.siteUrl}/articles/${a.slug}.html</guid>
+      <pubDate>${new Date(a.date).toUTCString()}</pubDate>
+      <description><![CDATA[${a.excerpt || ''}]]></description>
+      <category>${a.category || 'Games'}</category>
+    </item>
+  `).join('\n');
+
+  const rss = `<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>${siteConfig.siteTitle}</title>
+  <link>${siteConfig.siteUrl}/</link>
+  <description>${siteConfig.description}</description>
+  <language>en-us</language>
+  <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+  <atom:link href="${siteConfig.siteUrl}/rss.xml" rel="self" type="application/rss+xml" />
+  ${feedItems}
+</channel>
+</rss>`;
+
+  fs.writeFileSync(path.join(OUTPUT_DIR, 'rss.xml'), rss);
+  console.log('✓ rss.xml (RSS 2.0 Feed) built');
+}
+
 // 6. Build Sitemap.xml, Robots.txt & CNAME
 function buildSEOFiles(articles) {
-  // CNAME
   fs.writeFileSync(path.join(OUTPUT_DIR, 'CNAME'), `${siteConfig.domain}\n`);
 
-  // Robots.txt
-  const robots = `User-agent: *\nAllow: /\n\nSitemap: ${siteConfig.siteUrl}/sitemap.xml\n`;
+  const robots = `User-agent: *
+Allow: /
+
+Sitemap: ${siteConfig.siteUrl}/sitemap.xml
+`;
   fs.writeFileSync(path.join(OUTPUT_DIR, 'robots.txt'), robots);
 
-  // Sitemap.xml
   const currentDate = new Date().toISOString().split('T')[0];
   let urls = [
     `<url><loc>${siteConfig.siteUrl}/</loc><lastmod>${currentDate}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>`,
@@ -766,7 +934,7 @@ function buildSEOFiles(articles) {
 
 // Master Build Execution
 function run() {
-  console.log('🚀 Building GamesPlat.com static site...');
+  console.log('🚀 Building GamesPlat.com with Elite SEO Engine...');
   const articles = loadAllArticles();
   console.log(`Found ${articles.length} articles in content/articles/`);
 
@@ -774,9 +942,10 @@ function run() {
   buildCategoryPages(articles);
   buildArticlePages(articles);
   buildLegalPages();
+  buildRSSFeed(articles);
   buildSEOFiles(articles);
 
-  console.log('🎉 Build completed successfully!');
+  console.log('🎉 Elite SEO Build completed successfully!');
 }
 
 run();
