@@ -58,7 +58,8 @@ function renderSEOHead({
   ogImage,
   publishDate,
   category,
-  structuredData = []
+  structuredData = [],
+  basePath = ''
 }) {
   const finalImage = ogImage || siteConfig.defaultOgImage;
   const googleVerification = siteConfig.googleSiteVerification ? `<meta name="google-site-verification" content="${siteConfig.googleSiteVerification}">` : '';
@@ -113,6 +114,11 @@ function renderSEOHead({
   <!-- RSS Feed Link -->
   <link rel="alternate" type="application/rss+xml" title="${siteConfig.siteTitle} RSS Feed" href="${siteConfig.siteUrl}/rss.xml">
 
+  <!-- Favicon & Brand Icons -->
+  <link rel="icon" type="image/png" href="${basePath}assets/images/favicon.png">
+  <link rel="shortcut icon" href="${basePath}favicon.ico">
+  <link rel="apple-touch-icon" href="${basePath}assets/images/favicon.png">
+
   <!-- Preconnect for Google Fonts Speed -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -164,9 +170,8 @@ function renderHeader(activePage = '', basePath = '') {
   return `
   <header class="site-header">
     <div class="container header-inner">
-      <a href="${basePath}index.html" class="logo">
-        <div class="logo-badge">🎮</div>
-        <span>Games<span class="accent">Plat</span></span>
+      <a href="${basePath}index.html" class="logo" aria-label="GamesPlat Home">
+        <img src="${basePath}assets/images/logo.png" alt="GamesPlat" class="site-logo-img">
       </a>
 
       <button class="mobile-menu-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
@@ -194,9 +199,8 @@ function renderFooter(basePath = '') {
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <a href="${basePath}index.html" class="logo">
-            <div class="logo-badge">🎮</div>
-            <span>Games<span class="accent" style="color:#818cf8;">Plat</span></span>
+          <a href="${basePath}index.html" aria-label="GamesPlat Home">
+            <img src="${basePath}assets/images/logo.png" alt="GamesPlat" class="footer-logo-img">
           </a>
           <p class="footer-tagline">${siteConfig.tagline}. Making game nights, holidays, and classroom brain breaks unforgettable.</p>
           <div style="display:flex; gap:0.75rem; margin-top:1rem;">
@@ -475,7 +479,8 @@ function buildCategoryPages(articles) {
       canonicalUrl: catUrl,
       ogType: 'website',
       ogImage: filteredArticles[0]?.image || siteConfig.defaultOgImage,
-      structuredData
+      structuredData,
+      basePath: '../'
     });
 
     const html = `<!DOCTYPE html>
@@ -643,7 +648,8 @@ function buildArticlePages(articles) {
       ogImage: article.image || siteConfig.defaultOgImage,
       publishDate: article.date,
       category: cat.name,
-      structuredData
+      structuredData,
+      basePath: '../'
     });
 
     const html = `<!DOCTYPE html>
@@ -841,7 +847,8 @@ function buildLegalPages() {
       title: `${p.title} — GamesPlat.com`,
       description: `${p.title} for GamesPlat.com.`,
       canonicalUrl: pageUrl,
-      ogType: 'website'
+      ogType: 'website',
+      basePath: ''
     });
 
     const html = `<!DOCTYPE html>

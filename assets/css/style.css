@@ -142,6 +142,30 @@ a {
   color: #4f46e5;
 }
 
+.site-logo-img {
+  height: 48px;
+  width: auto;
+  max-width: 170px;
+  object-fit: contain;
+  display: block;
+  border-radius: 0;
+  transition: transform 0.2s ease;
+}
+
+.site-logo-img:hover {
+  transform: scale(1.04);
+}
+
+.footer-logo-img {
+  height: 52px;
+  width: auto;
+  max-width: 180px;
+  object-fit: contain;
+  display: block;
+  border-radius: 0;
+  margin-bottom: 1.25rem;
+}
+
 .nav-links {
   display: flex;
   align-items: center;
