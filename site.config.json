@@ -1,0 +1,44 @@
+{
+  "siteTitle": "GamesPlat",
+  "tagline": "The Ultimate Playbook for Party, Family & Classroom Games",
+  "description": "Discover fun party games, family game night ideas, classroom icebreakers, and step-by-step how-to-play rules for board & card games.",
+  "domain": "gamesplat.com",
+  "siteUrl": "https://gamesplat.com",
+  "author": "GamesPlat Editorial Team",
+  "contactEmail": "hello@gamesplat.com",
+  "categories": [
+    {
+      "name": "Party Games",
+      "slug": "party-games",
+      "description": "Hilarious and engaging games for birthdays, holidays, baby showers, and office gatherings.",
+      "color": "party",
+      "icon": "🎉"
+    },
+    {
+      "name": "Family Games",
+      "slug": "family-games",
+      "description": "Screen-free entertainment for game nights, road trips, rainy afternoons, and outdoor fun.",
+      "color": "family",
+      "icon": "🎲"
+    },
+    {
+      "name": "Board & Card Games",
+      "slug": "board-card-games",
+      "description": "Clear, beginner-friendly rules, setup guides, and winning strategies for tabletop favorites.",
+      "color": "board",
+      "icon": "🃏"
+    },
+    {
+      "name": "Classroom Games",
+      "slug": "classroom-games",
+      "description": "Quick brain breaks, educational challenges, and indoor recess games teachers love.",
+      "color": "classroom",
+      "icon": "🎒"
+    }
+  ],
+  "socials": {
+    "pinterest": "https://pinterest.com/gamesplat",
+    "facebook": "https://facebook.com/gamesplat",
+    "instagram": "https://instagram.com/gamesplat"
+  }
+}
