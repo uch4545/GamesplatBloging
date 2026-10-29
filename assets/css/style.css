@@ -930,3 +930,56 @@ a {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* Homepage intro, FAQ, no-results, footer social icons */
+.faq-answer { display: none; }
+.no-results { display: none; text-align: center; padding: 3rem; color: var(--text-muted); }
+.home-intro { max-width: 820px; margin: 3rem auto 2.5rem; }
+.home-intro-title { font-size: 1.9rem; font-weight: 800; margin-bottom: 1rem; }
+.home-intro p { color: var(--text-muted); line-height: 1.75; margin-bottom: 1rem; }
+.home-intro a { color: var(--primary); font-weight: 700; }
+.home-faq { max-width: 820px; margin: 0 auto 3rem; }
+.home-faq-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 1.25rem; }
+.social-icons { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1rem; }
+.social-icon { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); color: var(--text-muted); transition: color 0.2s ease, border-color 0.2s ease, transform 0.2s ease; }
+.social-icon:hover { color: var(--primary); border-color: var(--primary); transform: translateY(-2px); }
+
+/* BEGIN GENERATED INLINE STYLES (build.js) */
+html body .u1 { min-width:260px; }
+html body .u2 { width:100%; padding:0.6rem 1rem; border-radius:var(--radius-full); border:1px solid var(--border); font-size:0.9rem; }
+html body .u3 { margin-bottom:4rem; }
+html body .u4 { display:flex; gap:0.75rem; margin-top:1rem; }
+html body .u5 { color:#f43f5e; font-weight:700; font-size:0.85rem; }
+html body .u6 { color:#475569; }
+html body .u7 { color:#f59e0b; font-weight:700; font-size:0.85rem; }
+html body .u8 { color:#64748b; }
+html body .u9 { background:var(--bg-alt); padding:3.5rem 0; text-align:center; border-bottom:1px solid var(--border); }
+html body .u10 { font-size:0.95rem; padding:0.4rem 1.2rem; }
+html body .u11 { font-size:2.6rem; font-weight:800; margin-top:0.75rem; }
+html body .u12 { color:var(--text-muted); max-width:600px; margin-inline:auto; font-size:1.1rem; margin-top:0.5rem; }
+html body .u13 { padding-top:3rem; }
+html body .u14 { grid-column: 1 / -1; text-align:center; padding: 4rem 1rem; color:var(--text-muted); }
+html body .u15 { justify-content:center; margin-bottom:1.5rem; }
+html body .u16 { justify-content:center; }
+html body .u17 { font-weight:800; font-size:1.1rem; color:#991b1b; margin-bottom:0.25rem; }
+html body .u18 { font-size:0.88rem; color:#b91c1c; }
+html body .u19 { white-space:nowrap; padding:0.6rem 1.2rem; }
+html body .u20 { font-size:1.8rem; font-weight:800; margin-bottom:1.25rem; }
+html body .u21 { background:var(--bg-alt); border-radius:var(--radius-md); padding:1.5rem; margin-top:2.5rem; display:flex; align-items:center; gap:1.25rem; }
+html body .u22 { font-size:2.5rem; background:var(--bg-card); border:1px solid var(--border); width:64px; height:64px; border-radius:var(--radius-full); display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-sm); }
+html body .u23 { font-weight:800; font-size:1.05rem; }
+html body .u24 { font-size:0.88rem; color:var(--text-muted); margin-top:0.25rem; }
+html body .u25 { padding: 3rem 0; }
+html body .u26 { font-size:2.5rem; font-weight:800; margin-bottom:1.5rem; }
+html body .u27 { color:var(--primary); font-weight:700; }
+html body .u28 { background:var(--bg-alt); padding:1.75rem; border-radius:var(--radius-md); margin:2rem 0; }
+html body .u29 { margin-top:0.5rem; }
+html body .u30 { color:#f43f5e; font-weight:700; }
+html body .u31 { min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; padding:2rem; background:var(--bg-body); }
+html body .u32 { max-width:500px; background:var(--bg-card); padding:3rem 2rem; border-radius:var(--radius-lg); border:1px solid var(--border); box-shadow:var(--shadow-lg); }
+html body .u33 { font-size:3.5rem; margin-bottom:1rem; }
+html body .u34 { font-size:2rem; font-weight:800; margin-bottom:0.75rem; }
+html body .u35 { color:var(--text-muted); margin-bottom:2rem; line-height:1.6; }
+html body .u36 { display:inline-block; padding:0.8rem 2rem; text-decoration:none; }
+html body .u37 { font-size:0.8rem; color:var(--text-light); margin-top:1.5rem; }
+/* END GENERATED INLINE STYLES */

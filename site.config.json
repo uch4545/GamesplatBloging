@@ -7,8 +7,9 @@
   "author": "GamesPlat Editorial Team",
   "contactEmail": "hello@gamesplat.com",
   "defaultOgImage": "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&auto=format&fit=crop&q=80",
-  "googleSiteVerification": "",
+  "googleSiteVerification": "6655d7cc98634e4b",
   "pinterestVerification": "",
+  "bingVerification": "",
   "googleAnalyticsId": "G-Q98WM97T6S",
   "categories": [
     {
@@ -43,6 +44,9 @@
   "socials": {
     "pinterest": "https://pinterest.com/gamesplat",
     "facebook": "https://facebook.com/gamesplat",
-    "instagram": "https://instagram.com/gamesplat"
+    "instagram": "https://instagram.com/gamesplat",
+    "x": "",
+    "youtube": "",
+    "linkedin": ""
   }
 }
