@@ -244,9 +244,16 @@ function renderFooter(basePath = '') {
   <script src="${basePath}assets/js/main.js"></script>`;
 }
 
+function resolveImage(imgUrl, basePath = '') {
+  if (!imgUrl) return `${basePath}assets/images/default-game.jpg`;
+  if (imgUrl.startsWith('http://') || imgUrl.startsWith('https://')) return imgUrl;
+  if (imgUrl.startsWith('/')) return `${basePath}${imgUrl.slice(1)}`;
+  return `${basePath}${imgUrl}`;
+}
+
 function renderPostCard(article, basePath = '') {
   const cat = getCategoryMeta(article.category);
-  const imgUrl = article.image || siteConfig.defaultOgImage;
+  const imgUrl = resolveImage(article.image, basePath);
 
   return `
   <article class="post-card">
@@ -290,7 +297,7 @@ function buildHomepage(articles) {
     <section class="featured-section">
       <div class="featured-card">
         <div class="featured-img-wrap">
-          <img src="${featured.image || siteConfig.defaultOgImage}" alt="${featured.title}" decoding="async">
+          <img src="${resolveImage(featured.image, '')}" alt="${featured.title}" decoding="async">
         </div>
         <div class="featured-content">
           <div>
@@ -680,7 +687,7 @@ function buildArticlePages(articles) {
         </div>
       </header>
 
-      ${article.image ? `<img src="${article.image}" alt="${article.title}" class="article-featured-img" decoding="async">` : ''}
+      ${article.image ? `<img src="${resolveImage(article.image, '../')}" alt="${article.title}" class="article-featured-img" decoding="async">` : ''}
 
       <section class="game-specs-box">
         <div class="game-spec-item">
