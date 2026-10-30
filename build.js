@@ -230,7 +230,9 @@ function loadAllArticles() {
     const { data, content } = matter(fileContent);
 
     const slug = data.slug || file.replace(/\.md$/, '');
-    const htmlContent = marked.parse(content);
+    // Body images get width/height + lazy loading like every other <img>
+    const htmlContent = marked.parse(content).replace(/<img src="([^"]+)" alt="([^"]*)"[^>]*>/g,
+      (m, src, alt) => imgTag({ src: resolveImage(src, '../'), alt, className: 'article-body-img' }));
 
     const wordCount = content.split(/\s+/).length;
     const readingTime = Math.max(1, Math.round(wordCount / 200));
@@ -776,7 +778,7 @@ function buildArticlePages(articles) {
         }))
       });
 
-      faqAccordionHtml = `
+      if (!article.faqInBody) faqAccordionHtml = `
       <section class="faq-section">
         <h2 style="font-size:1.8rem; font-weight:800; margin-bottom:1.25rem;">Frequently Asked Questions</h2>
         ${article.faqs.map(f => `
