@@ -147,7 +147,7 @@ function renderSEOHead({
     : '';
   const heroPreload = heroImage ? `<link rel="preload" as="image" href="${heroImage}" fetchpriority="high">` : '';
   const googleVerification = siteConfig.googleSiteVerification ? `<meta name="google-site-verification" content="${siteConfig.googleSiteVerification}">` : '';
-  const pinterestVerification = siteConfig.pinterestVerification ? `<meta name="p-domain-verify" content="${siteConfig.pinterestVerification}">` : '';
+  const pinterestVerification = siteConfig.pinterestVerification ? `<meta name="p:domain_verify" content="${siteConfig.pinterestVerification}">` : '';
   const bingVerification = siteConfig.bingVerification ? `<meta name="msvalidate.01" content="${siteConfig.bingVerification}">` : '';
   const gaSnippet = siteConfig.googleAnalyticsId ? `
     <!-- Google Analytics (GA4) -->
@@ -497,7 +497,7 @@ function buildHomepage(articles) {
       "name": siteConfig.siteTitle,
       "url": `${siteConfig.siteUrl}/`,
       "logo": `${siteConfig.siteUrl}/assets/images/logo.png`,
-      "sameAs": Object.values(siteConfig.socials).filter(Boolean)
+      "sameAs": [siteConfig.socials.facebook, siteConfig.socials.pinterest].filter(Boolean)
     },
     {
       "@context": "https://schema.org",
@@ -955,7 +955,7 @@ function buildLegalPages() {
         <p>We'd love to hear from you! Whether you have feedback, want to suggest a game, or have business inquiries, you can reach out directly.</p>
         <div style="background:var(--bg-alt); padding:1.75rem; border-radius:var(--radius-md); margin:2rem 0;">
           <p><strong>Email:</strong> <a href="mailto:${siteConfig.contactEmail}" style="color:var(--primary); font-weight:700;">${siteConfig.contactEmail}</a></p>
-          <p style="margin-top:0.5rem;"><strong>Pinterest:</strong> <a href="${siteConfig.socials.pinterest}" target="_blank" rel="noopener" style="color:#f43f5e; font-weight:700;">pinterest.com/gamesplat</a></p>
+          <p style="margin-top:0.5rem;"><strong>Pinterest:</strong> <a href="${siteConfig.socials.pinterest}" target="_blank" rel="noopener" style="color:#f43f5e; font-weight:700;">pinterest.com/gamesplatcom</a></p>
           <p style="margin-top:0.5rem;"><strong>Response Time:</strong> We usually respond within 24 to 48 business hours.</p>
         </div>
       `
