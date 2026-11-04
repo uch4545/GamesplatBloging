@@ -44,6 +44,8 @@ It's a gift swap game with a twist: you can steal. Everyone brings one wrapped p
 
 It's called "white elephant" after an old story about gifts that are more of a burden than a treat. These days nobody minds, because the fun is in the chase. Some people bring useful gifts and others bring silly ones, and a good pile has some of each.
 
+![A pile of wrapped white elephant gifts with ribbons on a wooden floor](/assets/images/white-elephant-gift-pile.webp)
+
 ## White Elephant Rules: Step by Step
 
 1. **Set the budget.** Decide a price limit before the party. $15 to $25 is common.
@@ -68,6 +70,8 @@ Stealing is what makes white elephant fun, and it's also where most arguments st
 - **Opening is public:** Gifts get unwrapped in front of the whole group, because the reactions are half the show.
 
 Write the rules on a card and put it on the table. It saves a lot of debates.
+
+![Two friends laughing while one steals a wrapped gift at a holiday party](/assets/images/white-elephant-gift-steal.webp)
 
 ## How to Choose a White Elephant Gift
 
